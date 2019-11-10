@@ -1,0 +1,191 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="freeyunError" xml:space="preserve">
+    <value>接口弃用-请更新：-1000
+该服务已经停止：-1001
+软件尚未初始化：-1
+网络异常：-106
+封包错误：-107
+初始化-软件不存在或密钥错误：1001
+初始化-版本不存在：1002
+初始化-初始化成功：1003
+注册-软件已关闭注册：1043
+注册-用户名已存在：1004
+注册-机器码已经存在：1005
+注册-账号注册成功：1006
+登陆-软件已关闭验证：1007
+登陆-用户不存在：1008
+登陆-密码有误：1009
+登陆-机器码有误：1010
+登陆-账号过期：1011
+登陆-账号点数不足：1012
+登陆-验证人数已经上限：1013
+登陆-登陆成功：1014
+登陆-账号被锁定：1040
+用户信息-登陆过期：1015
+用户信息-用户已被删除：1016
+用户信息-查询成功：1017
+远程变量-登陆过期：1015
+远程变量-变量不存在：1018
+远程变量-获取成功：1019
+远程js-登陆过期：1015
+远程js-代码不存在：1020
+远程js-调用失败：1021
+远程js-调用成功：1022
+远程js-调用已达上限：1044
+留言反馈-软件不存在或密钥错误：1001
+留言反馈-5分钟内你已留言：1023
+留言反馈-留言成功：1024
+修改密码-用户不存在：1008
+修改密码-原始密码不正确：1025
+修改密码-密码修改成功：1026
+账号充值-卡号不存在：1027
+账号充值-卡号已被使用：1028
+账号充值-用户不存在：1008
+账号充值-充值成功：1029
+修改机器码-不允许修改机器码：1030
+修改机器码-用户不存在：1008
+修改机器码-用户密码错误：1009
+修改机器码-已在绑定机器码，无需修改：1031
+修改机器码-机器码已被占用：1005
+修改机器码-用户点数不足，换绑失败：1012
+修改机器码-用户剩余天数不足，换绑失败：1011
+修改机器码-换绑成功：1032
+取更新版本信息-软件版本不存在：1002
+取更新版本信息-软件信息获取成功：1033
+获取卡类型列表-登陆过期：1015
+获取卡类型列表-卡种类为空：1034
+获取卡类型列表-获取成功：1035
+创建支付-登陆过期：1015
+创建支付-卡类型不存在：1036
+创建支付-创建成功：1037
+创建支付-未开通在线支付功能：1038
+取用户状态-登陆过期：1015
+取用户状态-账号被锁定：1040
+取用户状态-账号过期：1011
+取用户状态-账号点数不足：1012
+取用户状态-账号账号正常：1039
+客户端扣点-登陆过期：1015
+客户端扣点-该软件不支持扣点：1041
+客户端扣点-账号登陆后被删除：1016
+客户端扣点-账号点数不足：1012
+客户端扣点-扣点成功：1042</value>
+  </data>
+</root>
