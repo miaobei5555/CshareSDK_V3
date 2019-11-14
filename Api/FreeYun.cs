@@ -420,9 +420,8 @@ namespace FreeYun.Api
         /// <summary>
         /// 创建支付链接_5
         /// </summary>
-        /// <param name="usr">账号</param>
         /// <param name="cardTypeId">充值卡类型ID，该值从取卡类型列表接口可获得</param>
-        public static Result_Info CreatePay(string usr, string cardTypeId)
+        public static Result_Info CreatePay( string cardTypeId)
         {
             string timestamp = FreeYunUtil.ToTimeStamp(DateTime.Now).ToString();
 
@@ -433,7 +432,7 @@ namespace FreeYun.Api
 
             JObject dic = new JObject();
 
-            dic.Add("account", usr);
+            dic.Add("account", mUser);
             dic.Add("cardTypeId", cardTypeId);
             dic.Add("macCode", macCode);
 
@@ -534,11 +533,11 @@ namespace FreeYun.Api
 
 
         /// <summary>
-        /// 加入黑名单_7
+        /// 加入黑名单_7 加入黑名单 有误 待排查
         /// </summary>
         /// <param name="usr">账号</param>
         /// <param name="blackType">/黑名单类型：1、IP黑名单  2、机器码黑名单</param>
-        public static Result_Info Blank(string usr, int blackType=1)
+        public static Result_Info Diss(string usr, int blackType=1)
         {
             string timestamp = FreeYunUtil.ToTimeStamp(DateTime.Now).ToString();
 
@@ -550,11 +549,12 @@ namespace FreeYun.Api
 
               
                 dic.Add("account", usr);
-                dic.Add("cardTypeId", blackType);
+               
                 dic.Add("macCode", macCode);
 
                 dic.Add("timestamp", timestamp);
                 dic.Add("secretKey", secretkey);
+                dic.Add("cardTypeId", blackType);
 
                 string data = JsonConvert.SerializeObject(dic);
 
@@ -616,10 +616,7 @@ namespace FreeYun.Api
 
             string data = JsonConvert.SerializeObject(dic);
 
-
-
             //var data = "{" + $"'account':'{usr}','oldPwd':'{oldPwd}','newPwd':'{newPwd}','timestamp':{timestamp},'macCode':'{macCode}','secretKey':'{secretkey}'".Replace("'", "\"") + "}";
-
 
             var ret = Request(13, data);
             JObject json = (JObject)JsonConvert.DeserializeObject(ret);
@@ -901,39 +898,37 @@ namespace FreeYun.Api
         public static Result_Info InfoStatus()
         {
             string timestamp = FreeYunUtil.ToTimeStamp(DateTime.Now).ToString();
-            var data = "{" + $"'account':'{usr}','token':'{token}','timestamp':{timestamp},'macCode':'{macCode}','secretKey':'{secretkey}'".Replace("'", "\"") + "}";
+            var data = "{" + $"'account':'{mUser}','token':'{mToken}','timestamp':{timestamp},'macCode':'{macCode}','secretKey':'{secretkey}'".Replace("'", "\"") + "}";
 
             var info = new Result_Info();
 
             try
             {
 
-         
-
-            var ret = Request(17, data);
-            JObject json = (JObject)JsonConvert.DeserializeObject(ret);
-            var code = json["code"].ToString();
-            string status;
+                var ret = Request(17, data);
+                JObject json = (JObject)JsonConvert.DeserializeObject(ret);
+                var code = json["code"].ToString();
+                string status;
 
 
-            if (code != "1039")
-            {
-                status = GetMsg(code);
-                 info.Html = "取用户状态失败,原因: " + GetMsg(code);
+                if (code != "1039")
+                {
+                    status = GetMsg(code);
+                     info.Html = "取用户状态失败,原因: " + GetMsg(code);
                 
-            }
-            else
-            {
-                info.Html = "ok";
-                info.Is_bool = true;
-            }
+                }
+                else
+                {
+                    info.Html = "ok";
+                    info.Is_bool = true;
+                }
 
-            }catch(Exception ex)
-            {
-                info.Html = ex.Message;
+                }catch(Exception ex)
+                {
+                    info.Html = ex.Message;
 
-            }
-            return info;
+                }
+                return info;
         }
 
 
@@ -965,7 +960,7 @@ namespace FreeYun.Api
             {
 
 
-                var ret = Request(17, data);
+                var ret = Request(22, data);
                 JObject json = (JObject)JsonConvert.DeserializeObject(ret);
                 var code = json["code"].ToString();
                 string status;
@@ -974,7 +969,7 @@ namespace FreeYun.Api
                 if (code != "1051")
                 {
                     status = GetMsg(code);
-                    info.Html = "取用户状态失败,原因: " + GetMsg(code);
+                    info.Html = "远程转发失败,原因: " + GetMsg(code);
 
                 }
                 else
@@ -993,6 +988,61 @@ namespace FreeYun.Api
             return info;
         }
 
+
+
+        /// <summary>
+        /// 取在线人数
+        /// </summary>
+        /// <param name="remoteId"> 转发列表对应id</param>
+        /// <param name="_params"></param>
+        /// <returns></returns>
+        public static Result_Info GetOnLineCount()
+        {
+            string timestamp = FreeYunUtil.ToTimeStamp(DateTime.Now).ToString();
+            JObject dic = new JObject();
+            dic.Add("version", version);
+         
+            dic.Add("timestamp", timestamp);
+            dic.Add("macCode", macCode);
+            dic.Add("secretKey", secretkey);
+          
+
+            var data = JsonConvert.SerializeObject(dic);
+
+
+            var info = new Result_Info();
+
+            try
+            {
+
+
+                var ret = Request(23, data);
+                JObject json = (JObject)JsonConvert.DeserializeObject(ret);
+                var code = json["code"].ToString();
+                string status;
+
+
+                if (code != "1054")
+                {
+                    status = GetMsg(code);
+                    info.Html = "取在线人数失败,原因: " + GetMsg(code);
+
+                }
+                else
+                {
+                    info.Html = "ok";
+                    info.other = json["onlineNum"].ToString();
+                    info.Is_bool = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                info.Html = ex.Message;
+
+            }
+            return info;
+        }
 
         //==========以前的分割线=========
 
