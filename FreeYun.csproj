@@ -54,7 +54,7 @@
   <ItemGroup>
     <Compile Include="Api\AccountInfo.cs" />
     <Compile Include="Api\CardType.cs" />
-    <Compile Include="Api\FreeYun.cs" />
+    <Compile Include="Api\FreeYunApi.cs" />
     <Compile Include="Api\FreeYunUtil.cs" />
     <Compile Include="Api\InitInfo.cs" />
     <Compile Include="Api\Result_Info.cs" />

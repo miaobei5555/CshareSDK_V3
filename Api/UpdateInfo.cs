@@ -8,35 +8,37 @@ namespace FreeYun.Api
     /// <summary>
     /// 更新信息
     /// </summary>
+    [Serializable]
     public class UpdateInfo
     {
-        /// <summary>
-        /// 更新描述
-        /// </summary>
-        public string Desc { get; set; }
+            /// <summary>
+            /// 要启动的软件名称 如果文件名称 没有. 可以不需要加.exe
+            /// </summary>
+            public string AppName { get; set; }
 
-        /// <summary>
-        /// 当前版本主程序md5
-        /// </summary>
-        public string Md5 { get; set; }
+            /// <summary>
+            /// 应用程序版本
+            /// </summary>
+            public string AppVersion { get; set; }
 
-        /// <summary>
-        /// 版本名
-        /// </summary>
-        public string VerName { get; set; }
+            /// <summary>
+            /// 升级需要的最低版本 暂时不需要用到
+            /// </summary>
+            public string RequiredMinVersion { get; set; }
 
-        /// <summary>
-        /// 这里是下载地址
-        /// </summary>
-        public string Url { get; set; }
+            public string MD5 { get; set; }
 
-        public UpdateInfo(string desc, string md5, string verName, string url)
-        {
-            this.Desc = desc;
-            this.Md5 = md5;
-            this.VerName = verName;
-            this.Url = url;
-        }
+            /// <summary>
+            /// 更新描述
+            /// </summary>
+
+            public string Desc { get; set; }
+
+            /// <summary>
+            /// 下载url
+            /// </summary>
+            public string DownUrl { get; set; }
+
 
     }
 }

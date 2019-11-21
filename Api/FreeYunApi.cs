@@ -17,7 +17,7 @@ namespace FreeYun.Api
     /// <summary>
     /// 
     /// </summary>
-    public static  class FreeYun
+    public static  class FreeYunApi
     {
         #region 属性/方法
         public static string LastErr = "";
@@ -715,7 +715,14 @@ namespace FreeYun.Api
             var md5 = json["md5"].ToString();
             var name = json["name"].ToString();
             var url = json["url"].ToString();
-            return new UpdateInfo(describe, md5, name, url);
+
+            var upINfo = new UpdateInfo();
+            upINfo.Desc = describe;
+            upINfo.MD5 = md5;
+            upINfo.DownUrl = url;
+            upINfo.AppName = name;
+
+            return upINfo;
 
         }
 
