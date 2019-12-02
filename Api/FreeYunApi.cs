@@ -11,6 +11,8 @@ using System.Net;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using JinYiHelp.EasyHTTPClient;
+using System.Threading.Tasks;
 
 namespace FreeYun.Api
 {
@@ -67,7 +69,7 @@ namespace FreeYun.Api
         /// <param name="wtype">请求操作的类型（值范围在：1-18）具体请求对应值请看对应请求对应值</param>
         /// <param name="body">提交数据</param>
         /// <returns>内容</returns>
-        private static string Request(int wtype, string body)
+        private async static Task<string> Request(int wtype, string body)
         {
             try
             {
@@ -76,21 +78,43 @@ namespace FreeYun.Api
 
                 var tem = FreeYunUtil.DesEncryptToByte(body, desKey, CipherMode.ECB, PaddingMode.PKCS7);
                 var hex = FreeYunUtil.ByteToHex(tem);
-                var url = "https://api.freeyun.net/webgateway.html";
+                //var url = "https://api.freeyun.net/webgateway.html";
+
+                var url = "https://bgp.freeyun.net/webgateway.html";
 
                 var _tstr = string.Format("{0}{1}{2}{3}{4}", wtype, timestamp, salt, appid, hex);
-                var sign = FreeYunUtil.MD5(_tstr);
-                var sendBody = "version=1.1.3&appid={0}&secretkey={1}&wtype={2}&sign={3}&timestamp={4}&data={5}";//这个版本号 是sdk网络验证的版本号 非软件的
+                var sign = FreeYunUtil.MD5(_tstr);//version=1.1.3&
+                var sendBody = "appid={0}&secretkey={1}&wtype={2}&sign={3}&timestamp={4}&data={5}";//这个版本号 是sdk网络验证的版本号 非软件的
                 sendBody = string.Format(sendBody, appid, secretkey, wtype, sign, timestamp, hex);
 
+                var item = new HttpItem()
+                {
+                    URL=url,
+                    Method=System.Net.Http.HttpMethod.Post,
+                    Postdata=sendBody,
+                    Encoding=Encoding.UTF8,
+                    ContentType= "application/x-www-form-urlencoded",
+                    Timeout=30,
+                    
+                };
 
-                var buffer = Encoding.UTF8.GetBytes(sendBody);
+                item.Header.Add("Version", "1.1.3");
+
+                var result =await item.GetHtml();
+
+                string html = result.Html;
+
+                /*
+                 * 
+                    var buffer = Encoding.UTF8.GetBytes(sendBody);
                 retry:
                 var req = HttpWebRequest.Create(url);
                 req.Timeout = 60 * 1000;
                 req.Method = "POST";
                 req.ContentType = "application/x-www-form-urlencoded";
                 req.ContentLength = buffer.Length;
+                req.Headers.Add("Version", "1.1.3");
+
                 req.GetRequestStream().Write(buffer, 0, buffer.Length);
                 var html = string.Empty;
                 using (var rsp = req.GetResponse())
@@ -105,16 +129,26 @@ namespace FreeYun.Api
                     Thread.Sleep(1000);
                     goto retry;
                 }
+
+                */
+
+
+
                 JObject json = (JObject)JsonConvert.DeserializeObject(html);
                 var msg = json["msg"].ToString();
                 var data = json["data"].ToString();
                 var status = json["status"].ToString();
                 if (status == "-1")
+                {
                     throw new Exception(FreeYunUtil.IsNull(msg) ? "未知错误" : msg);
-                if (status != "0")
-                    goto retry;
-                var str = Encoding.UTF8.GetString(FreeYunUtil.DesDecrypt(FreeYunUtil.HexToByte(data), desKey, CipherMode.ECB, PaddingMode.PKCS7));
+                }
+                   
+             
+                string str = Encoding.UTF8.GetString(FreeYunUtil.DesDecrypt(FreeYunUtil.HexToByte(data), desKey, CipherMode.ECB, PaddingMode.PKCS7));
+
                 return str;
+                
+
             }
             catch (Exception e)
             {
@@ -139,7 +173,7 @@ namespace FreeYun.Api
         /// <param name="_mackCode">机器码</param>
         /// <param name="_version">当前版本号</param>
         /// <returns></returns>
-        public static InitInfo Init(int _appid, string _secretkey, string _salt, string _desKey, string _mackCode, string _version)
+        public async static  Task<InitInfo> Init(int _appid, string _secretkey, string _salt, string _desKey, string _mackCode, string _version)
         {
             appid = _appid;
             secretkey = _secretkey;
@@ -162,7 +196,7 @@ namespace FreeYun.Api
                 string data = JsonConvert.SerializeObject(dic);
 
 
-                var ret = Request(1, data);
+                var ret =await Request(1, data);
 
                 if (string.IsNullOrEmpty(ret)) return null;
 
@@ -219,7 +253,7 @@ namespace FreeYun.Api
         /// <param name="mobile">手机号码选填</param>
         /// <param name="invitingCode">邀请码选填</param>
         /// <param name="agentCode">代理商代理编号，该参数为代理商列表的代理编号，可空，可内置在软件用于指定不同的代理商注册的用户所有权</param>
-        public static Result_Info Register(string usr, string pwd, 
+        public async static  Task<Result_Info> Register(string usr, string pwd, 
             string qq="", string email="", string mobile="", string invitingCode="",string agentCode="")
         {
             string timestamp = FreeYunUtil.ToTimeStamp(DateTime.Now).ToString();
@@ -266,11 +300,10 @@ namespace FreeYun.Api
             try
             {
 
-
                 string data = JsonConvert.SerializeObject(dic);
 
 
-                var ret = Request(2, data);
+                var ret =await Request(2, data);
 
                 if (!FreeYunUtil.IsJson(ret))
                 {
@@ -283,7 +316,6 @@ namespace FreeYun.Api
                 if (code != "1006")
                 {
                     info.Html = "注册失败,原因:" + GetMsg(code);
-
 
                 }
                 else
@@ -313,7 +345,7 @@ namespace FreeYun.Api
         /// <param name="pwd">密码</param>
         /// <param name="version">软件本地版本</param>
         /// <returns>TOKEN</returns>
-        public static Result_Info Login(string usr, string pwd)
+        public async static  Task<Result_Info> Login(string usr, string pwd)
         {
             Result_Info info = new Result_Info();
             try
@@ -334,7 +366,7 @@ namespace FreeYun.Api
 
                 string data = JsonConvert.SerializeObject(dic);
 
-                var ret = Request(3, data);
+                var ret =await Request(3, data);
                 JObject json = (JObject)JsonConvert.DeserializeObject(ret);
                 var code = json["code"].ToString();
 
@@ -370,7 +402,7 @@ namespace FreeYun.Api
         /// </summary>
         /// <param name="usr">账号</param>
         /// <param name="cardNo">卡号</param>
-        public static Result_Info Card(string usr,string cardNo)
+        public async static  Task<Result_Info> Card(string usr,string cardNo)
         {
             var info = new Result_Info();
 
@@ -390,7 +422,7 @@ namespace FreeYun.Api
 
                 string data = JsonConvert.SerializeObject(dic);
                     
-                var ret = Request(4, data);
+                var ret =await Request(4, data);
                 JObject json = (JObject)JsonConvert.DeserializeObject(ret);
                 var code = json["code"].ToString();
 
@@ -421,7 +453,7 @@ namespace FreeYun.Api
         /// 创建支付链接_5
         /// </summary>
         /// <param name="cardTypeId">充值卡类型ID，该值从取卡类型列表接口可获得</param>
-        public static Result_Info CreatePay( string cardTypeId)
+        public async static  Task<Result_Info> CreatePay( string cardTypeId)
         {
             string timestamp = FreeYunUtil.ToTimeStamp(DateTime.Now).ToString();
 
@@ -441,7 +473,7 @@ namespace FreeYun.Api
 
             string data = JsonConvert.SerializeObject(dic);
  
-            var ret = Request(5, data);
+            var ret =await Request(5, data);
             JObject json = (JObject)JsonConvert.DeserializeObject(ret);
             var code = json["code"].ToString();
            
@@ -479,7 +511,7 @@ namespace FreeYun.Api
         /// <param name="token">登录返回的TOKEN</param>
         /// <param name="err_code">查询错误返回错误码</param>
         /// <returns>账号信息</returns>
-        public static AccountInfo Info()
+        public async static  Task<AccountInfo> Info()
         {
             string timestamp = FreeYunUtil.ToTimeStamp(DateTime.Now).ToString();
 
@@ -502,7 +534,7 @@ namespace FreeYun.Api
 
             //var data = "{" + $"'account':'{usr}','token':'{token}','timestamp':{timestamp},'macCode':'{macCode}','secretKey':'{secretkey}'".Replace("'", "\"") + "}";
 
-            var ret = Request(6, data);
+            var ret =await Request(6, data);
             JObject json = (JObject)JsonConvert.DeserializeObject(ret);
             var code = json["code"].ToString();
             string status;
@@ -537,7 +569,7 @@ namespace FreeYun.Api
         /// </summary>
         /// <param name="usr">账号</param>
         /// <param name="blackType">/黑名单类型：1、IP黑名单  2、机器码黑名单</param>
-        public static Result_Info Diss(string usr, int blackType=1)
+        public async static  Task<Result_Info> Diss(string usr, int blackType=1)
         {
             string timestamp = FreeYunUtil.ToTimeStamp(DateTime.Now).ToString();
 
@@ -560,7 +592,7 @@ namespace FreeYun.Api
 
                 //var data = "{" + $"'account':'{usr}','cardTypeId':'{blackType}','timestamp':{timestamp},'macCode':'{macCode}','secretKey':'{secretkey}'".Replace("'", "\"") + "}";
           
-            var ret = Request(20, data);
+            var ret =await Request(20, data);
             JObject json = (JObject)JsonConvert.DeserializeObject(ret);
             var code = json["code"].ToString();
 
@@ -594,7 +626,7 @@ namespace FreeYun.Api
         /// <param name="usr">账号</param>
         /// <param name="oldPwd">旧密码</param>
         /// <param name="newPwd">新密码</param>
-        public static Result_Info ChangePwd(string usr, string oldPwd, string newPwd)
+        public async static  Task<Result_Info> ChangePwd(string usr, string oldPwd, string newPwd)
         {
 
             string timestamp = FreeYunUtil.ToTimeStamp(DateTime.Now).ToString();
@@ -618,7 +650,7 @@ namespace FreeYun.Api
 
             //var data = "{" + $"'account':'{usr}','oldPwd':'{oldPwd}','newPwd':'{newPwd}','timestamp':{timestamp},'macCode':'{macCode}','secretKey':'{secretkey}'".Replace("'", "\"") + "}";
 
-            var ret = Request(13, data);
+            var ret =await Request(13, data);
             JObject json = (JObject)JsonConvert.DeserializeObject(ret);
             var code = json["code"].ToString();
             if (code != "1026")
@@ -650,7 +682,7 @@ namespace FreeYun.Api
         /// <param name="usr">账号</param>
         /// <param name="token">退出的token</param>
         /// <returns>是否退出成功</returns>
-        public static bool Logout()
+        public async static Task<bool> Logout()
         {
             string timestamp = FreeYunUtil.ToTimeStamp(DateTime.Now).ToString();
 
@@ -668,7 +700,7 @@ namespace FreeYun.Api
 
            // var data = "{" + $"'account':'{usr}','token':'{token}','timestamp':{timestamp},'macCode':'{macCode}','secretKey':'{secretkey}'".Replace("'", "\"") + "}";
 
-            var ret = Request(14, data);
+            var ret =await Request(14, data);
             JObject json = (JObject)JsonConvert.DeserializeObject(ret);
             if (json == null) return false;
 
@@ -680,7 +712,7 @@ namespace FreeYun.Api
         /// 取更新信息
         /// </summary>
         /// <returns>更新信息或Null</returns>
-        public static UpdateInfo GetUpdateInfo()
+        public async static Task<UpdateInfo> GetUpdateInfo()
         {
             string timestamp = FreeYunUtil.ToTimeStamp(DateTime.Now).ToString();
 
@@ -697,7 +729,7 @@ namespace FreeYun.Api
 
             //var data = "{" + $"'version':'{version}','timestamp':{timestamp},'macCode':'{macCode}','secretKey':'{secretkey}'".Replace("'", "\"") + "}";
 
-            var ret = Request(15, data);
+            var ret =await Request(15, data);
 
             if (!FreeYunUtil.IsJson(ret))
             {
@@ -731,7 +763,7 @@ namespace FreeYun.Api
         /// 读取充值卡类型列表
         /// </summary>
         /// <returns>充值卡类型列表</returns>
-        public static List<CardType> CardTypeList()
+        public async static Task<List<CardType>> CardTypeList()
         {
             string timestamp = FreeYunUtil.ToTimeStamp(DateTime.Now).ToString();
 
@@ -742,7 +774,7 @@ namespace FreeYun.Api
            
 
             var cardTypeList = new List<CardType>();
-            var ret = Request(16, "");
+            var ret =await Request(16, "");
             JObject json = (JObject)JsonConvert.DeserializeObject(ret);
             var code = json["code"].ToString();
 
@@ -775,7 +807,7 @@ namespace FreeYun.Api
         /// <param name="token">登录返回的TOKEN</param>
         /// <param name="keyName">变量名</param>
         /// <returns>变量值</returns>
-        public static Result_Info ReadVariable (string keyName)
+        public async static Task< Result_Info> ReadVariable (string keyName)
         {
             string timestamp = FreeYunUtil.ToTimeStamp(DateTime.Now).ToString();
 
@@ -799,7 +831,7 @@ namespace FreeYun.Api
 
             string data = JsonConvert.SerializeObject(dic);
 
-            var ret = Request(8, data);
+            var ret =await Request(8, data);
             JObject json = (JObject)JsonConvert.DeserializeObject(ret);
             var code = json["code"].ToString();
 
@@ -833,7 +865,7 @@ namespace FreeYun.Api
         /// </summary>
         /// <param name="usr">账号</param>
         /// <param name="token">登录返回的TOKEN</param>
-        public static Result_Info Heartbeat()
+        public async static Task< Result_Info> Heartbeat()
         {
             string timestamp = FreeYunUtil.ToTimeStamp(DateTime.Now).ToString();
 
@@ -843,7 +875,7 @@ namespace FreeYun.Api
             try
             {
 
-            var ret = Request(9, data);
+            var ret =await Request(9, data);
 
                 if (!FreeYunUtil.IsJson(ret))
                 {
@@ -882,12 +914,12 @@ namespace FreeYun.Api
         /// <param name="pwd">密码</param>
         /// <param name="macCode">新的机器码</param>
         /// <param name="userType">账号类型，2、单码类型</param>
-        public static void ModifyMac(string usr, string pwd, string _macCode, int userType = 1)
+        public async static void ModifyMac(string usr, string pwd, string _macCode, int userType = 1)
         {
             string timestamp = FreeYunUtil.ToTimeStamp(DateTime.Now).ToString();
             var data = "{" + $"'account':'{usr}','userType':'{userType}','password':'{pwd}','timestamp':{timestamp},'macCode':'{_macCode}','secretKey':'{secretkey}'".Replace("'", "\"") + "}";
 
-            var ret = Request(10, data);
+            var ret =await Request(10, data);
             JObject json = (JObject)JsonConvert.DeserializeObject(ret);
             var code = json["code"].ToString();
             if (code != "1032")
@@ -902,7 +934,7 @@ namespace FreeYun.Api
         /// <param name="usr">账号</param>
         /// <param name="token">登录返回的TOKEN</param>
         /// <returns>账号信息</returns>
-        public static Result_Info InfoStatus()
+        public async static Task< Result_Info> InfoStatus()
         {
             string timestamp = FreeYunUtil.ToTimeStamp(DateTime.Now).ToString();
             var data = "{" + $"'account':'{mUser}','token':'{mToken}','timestamp':{timestamp},'macCode':'{macCode}','secretKey':'{secretkey}'".Replace("'", "\"") + "}";
@@ -912,7 +944,7 @@ namespace FreeYun.Api
             try
             {
 
-                var ret = Request(17, data);
+                var ret =await Request(17, data);
                 JObject json = (JObject)JsonConvert.DeserializeObject(ret);
                 var code = json["code"].ToString();
                 string status;
@@ -921,7 +953,7 @@ namespace FreeYun.Api
                 if (code != "1039")
                 {
                     status = GetMsg(code);
-                     info.Html = "取用户状态失败,原因: " + GetMsg(code);
+                    info.Html = "取用户状态失败,原因: " + GetMsg(code);
                 
                 }
                 else
@@ -946,7 +978,7 @@ namespace FreeYun.Api
        /// <param name="remoteId"> 转发列表对应id</param>
        /// <param name="_params"></param>
        /// <returns></returns>
-        public static Result_Info TranspondSer(string remoteId,string _params)
+        public async static Task<Result_Info> TranspondSer(string remoteId,string _params)
         {
             string timestamp = FreeYunUtil.ToTimeStamp(DateTime.Now).ToString();
             JObject dic = new JObject();
@@ -967,7 +999,7 @@ namespace FreeYun.Api
             {
 
 
-                var ret = Request(22, data);
+                var ret =await Request(22, data);
                 JObject json = (JObject)JsonConvert.DeserializeObject(ret);
                 var code = json["code"].ToString();
                 string status;
@@ -1003,7 +1035,7 @@ namespace FreeYun.Api
         /// <param name="remoteId"> 转发列表对应id</param>
         /// <param name="_params"></param>
         /// <returns></returns>
-        public static Result_Info GetOnLineCount()
+        public async static Task< Result_Info> GetOnLineCount()
         {
             string timestamp = FreeYunUtil.ToTimeStamp(DateTime.Now).ToString();
             JObject dic = new JObject();
@@ -1023,7 +1055,7 @@ namespace FreeYun.Api
             {
 
 
-                var ret = Request(23, data);
+                var ret =await Request(23, data);
                 JObject json = (JObject)JsonConvert.DeserializeObject(ret);
                 var code = json["code"].ToString();
                 string status;
